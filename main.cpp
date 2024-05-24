@@ -711,7 +711,7 @@ extern "C" int main(int argc, char** argv) {
   //turn automatic hd mounting off because kick1.2 makes trouble
   wrapper->amiga->configure(OPT_HDC_CONNECT,/*hd drive*/ 0, /*enable*/false);
 
-  wrapper->amiga->configure(OPT_DRIVE_CONNECT,/*df1*/ 1, /*enable*/true);
+  wrapper->amiga->configure(OPT_DRIVE_CONNECT,/*df1*/ 1, /*enable*/false);
   wrapper->run();
 
   return 0;
@@ -1511,7 +1511,7 @@ extern "C" void wasm_reset()
 
 extern "C" void wasm_halt()
 {
-  printf("wasm_halt\n");
+  // printf("wasm_halt\n");
   wrapper->amiga->pause();
 
 //  printf("emscripten_pause_main_loop() at MSG_PAUSE\n");
@@ -1523,9 +1523,9 @@ extern "C" void wasm_halt()
 
 extern "C" void wasm_run()
 {
-  if(log_on) printf("wasm_run\n");
+  //if(log_on) printf("wasm_run\n");
   
-  if(log_on) printf("is running = %u\n",wrapper->amiga->isRunning());
+  //if(log_on) printf("is running = %u\n",wrapper->amiga->isRunning());
 
   wrapper->amiga->run();
   thisAmiga=wrapper->amiga;
@@ -1892,6 +1892,7 @@ extern "C" const char* wasm_configure(char* option, char* _value)
   }
 
   try{
+  // TODO parse AUDVOL
     if( strcmp(option,"AGNUS_REVISION") == 0)
     {
       wrapper->amiga->configure(util::parseEnum <OptionEnum>(std::string(option)), util::parseEnum <AgnusRevisionEnum>(value)); 
@@ -1907,6 +1908,10 @@ extern "C" const char* wasm_configure(char* option, char* _value)
     else if( strcmp(option,"SER_DEVICE") == 0)
     {
       wrapper->amiga->configure(util::parseEnum <OptionEnum>(std::string(option)), util::parseEnum<SerialPortDeviceEnum>(value));
+    }
+    else if( strcmp(option,"AUDVOL") == 0)
+    {
+      wrapper->amiga->configure(OPT_AUDVOL, util::parseNum(value)); 
     }
     else if ( strcmp(option,"BLITTER_ACCURACY") == 0 ||
               strcmp(option,"DRIVE_SPEED") == 0  ||
@@ -2007,4 +2012,48 @@ extern "C" double wasm_activity()
 {
     auto dma = wrapper->amiga->agnus.getStats();
     return dma.blitterActivity;
+}
+
+extern "C" const char* wasm_shell(char *chars)
+{
+    // printf("main.cpp: wasm_shell(\"%s\")\n", chars);
+    wrapper->amiga->retroShell.press(chars);
+    return wrapper->amiga->retroShell.text();
+}
+
+extern "C" void wasm_warp_on_off(unsigned on)
+{
+    if (on == 1) {
+        wrapper->amiga->warpOn();
+    } else {
+        wrapper->amiga->warpOff();
+    }
+}
+
+extern "C" u16 wasm_peek16(u32 addr)
+{
+    // "peek16" does a proper CPU read! not what we want
+    // return wrapper->amiga->mem.peek16<ACCESSOR_CPU>(addr);
+    return wrapper->amiga->mem.spypeek16<ACCESSOR_CPU>(addr);
+}
+
+extern "C" u16 wasm_peek_custom(u32 addr)
+{
+    // u16 Memory::spypeekCustom16(u32 addr) const
+    return wrapper->amiga->mem.spypeekCustom16(addr);
+}
+
+// Read out u32 bplptFirst[VPOS_MAX_PAL][6] in Agnus
+extern "C" char* wasm_first_bpl_info(int line)
+{
+    Agnus *agnus = &(wrapper->amiga->agnus);
+    sprintf(buffer, "%x,%x,%x,%x,%x,%x", 
+        agnus->bplptFirst[line][0],
+        agnus->bplptFirst[line][1],
+        agnus->bplptFirst[line][2],
+        agnus->bplptFirst[line][3],
+        agnus->bplptFirst[line][4],
+        agnus->bplptFirst[line][5]
+    );  
+    return buffer;
 }

@@ -621,6 +621,19 @@ Agnus::eolHandler()
     // Move to the next line
     pos.eol();
 
+    hadFirstBpl[0] = false;
+    hadFirstBpl[1] = false;
+    hadFirstBpl[2] = false;
+    hadFirstBpl[3] = false;
+    hadFirstBpl[4] = false;
+    hadFirstBpl[5] = false;
+    bplptFirst[pos.v][0] = -1;
+    bplptFirst[pos.v][1] = -1;
+    bplptFirst[pos.v][2] = -1;
+    bplptFirst[pos.v][3] = -1;
+    bplptFirst[pos.v][4] = -1;
+    bplptFirst[pos.v][5] = -1;
+
     // Update pot counters
     if (paula.chargeX0 < 1.0) U8_INC(paula.potCntX0, 1);
     if (paula.chargeY0 < 1.0) U8_INC(paula.potCntY0, 1);

@@ -115,6 +115,11 @@ Agnus::doBitplaneDmaRead()
     assert(bitplane >= 0 && bitplane <= 5);
     constexpr BusOwner owner = BusOwner(BUS_BPL1 + bitplane);
     
+    if (!hadFirstBpl[bitplane]) {
+        bplptFirst[pos.v][bitplane] = bplpt[bitplane];
+        hadFirstBpl[bitplane] = true;
+    }
+    
     u16 result = mem.peek16 <ACCESSOR_AGNUS> (bplpt[bitplane]);
     bplpt[bitplane] += 2;
 

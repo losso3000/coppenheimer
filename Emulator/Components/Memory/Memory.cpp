@@ -2173,6 +2173,52 @@ Memory::spypeekCustom16(u32 addr) const
         case 0x07C >> 1: // DENISEID
             return denise.spypeekDENISEID();
 
+	// Losso: moar registers
+        case 0x080 >> 1: // COP1LCH
+            return HI_WORD(copper.cop1lc);
+        case 0x082 >> 1: // COP1LCL
+            return LO_WORD(copper.cop1lc);
+        case 0x084 >> 1: // COP2LCH
+            return HI_WORD(copper.cop2lc);
+        case 0x086 >> 1: // COP2LCL
+            return LO_WORD(copper.cop2lc);
+        case 0x108 >> 1: // BPL1MOD
+            return agnus.bpl1mod;
+        case 0x10A >> 1: // BPL2MOD
+            return agnus.bpl2mod;
+        case 0x08E >> 1: // DIWSTRT
+            return agnus.sequencer.diwstrt;
+        case 0x090 >> 1: // DIWSTOP
+            return agnus.sequencer.diwstop;
+        case 0x092 >> 1: // DDFSTRT
+            return agnus.sequencer.ddfstrt;
+        case 0x094 >> 1: // DDFSTOP
+            return agnus.sequencer.ddfstop;
+        case 0x0E0 >> 1: // BPL1PTH
+            return HI_WORD(agnus.bplpt[0]);
+        case 0x0E2 >> 1: // BPL1PTL
+            return LO_WORD(agnus.bplpt[0]);
+        case 0x0E4 >> 1: // BPL2PTH
+            return HI_WORD(agnus.bplpt[1]);
+        case 0x0E6 >> 1: // BPL2PTL
+            return LO_WORD(agnus.bplpt[1]);
+        case 0x0E8 >> 1: // BPL3PTH
+            return HI_WORD(agnus.bplpt[2]);
+        case 0x0EA >> 1: // BPL3PTL
+            return LO_WORD(agnus.bplpt[2]);
+        case 0x0EC >> 1: // BPL4PTH
+            return HI_WORD(agnus.bplpt[3]);
+        case 0x0EE >> 1: // BPL4PTL
+            return LO_WORD(agnus.bplpt[3]);
+        case 0x0F0 >> 1: // BPL5PTH
+            return HI_WORD(agnus.bplpt[4]);
+        case 0x0F2 >> 1: // BPL5PTL
+            return LO_WORD(agnus.bplpt[4]);
+        case 0x0F4 >> 1: // BPL6PTH
+            return HI_WORD(agnus.bplpt[5]);
+        case 0x0F6 >> 1: // BPL6PTL
+            return LO_WORD(agnus.bplpt[5]);
+ 
         default:
             return 0;
     }

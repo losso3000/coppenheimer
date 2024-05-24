@@ -42,11 +42,11 @@ private:
      * condition holds.
      */
     bool skip = false;
-
+public:
     // The Copper list location pointers
     u32 cop1lc = 0;
     u32 cop2lc = 0;
-
+private:
     // The Copper Danger bit (CDANG)
     bool cdang = false;
 

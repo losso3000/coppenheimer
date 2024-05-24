@@ -538,6 +538,13 @@ Agnus::_dump(Category category, std::ostream& os) const
         os << tab("BPL0PT") << hex(bplpt[0]) << "  BPL1PT : " << hex(bplpt[1]) << std::endl;
         os << tab("BPL2PT") << hex(bplpt[2]) << "  BPL3PT : " << hex(bplpt[3]) << std::endl;
         os << tab("BPL4PT") << hex(bplpt[4]) << "  BPL5PT : " << hex(bplpt[5]) << std::endl;
+
+        // Losso: add modulos
+        //     i16 bpl1mod = 0;
+        //     i16 bpl2mod = 0;
+        os << tab("BPL1MOD") << (bpl1mod) << " BPL1MOD : " << (bpl2mod) << std::endl;
+        os << tab("BPL1MOD") << dec(bpl1mod) << " BPL1MOD : " << dec(bpl2mod) << std::endl;
+
         os << std::endl;
         os << tab("SPR0PT") << hex(sprpt[0]) << "  SPR1PT : " << hex(sprpt[1]) << std::endl;
         os << tab("SPR2PT") << hex(sprpt[2]) << "  SPR3PT : " << hex(sprpt[3]) << std::endl;
