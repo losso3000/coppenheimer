@@ -18,6 +18,7 @@
 #include "DmaDebugger.h"
 #include "Sequencer.h"
 #include "Memory.h"
+#include "Constants.h"
 
 namespace vamiga {
 
@@ -123,6 +124,11 @@ public:
 
     // The bitplane DMA pointers
     u32 bplpt[6] = { };
+
+    bool hadFirstBpl[6] = { };
+    // u16 bpl1modFirst[VPOS_MAX_PAL] = { };
+    // u16 bpl2modFirst[VPOS_MAX_PAL] = { };
+    u32 bplptFirst[VPOS_MAX_PAL+8][6] = { };	// hackety hack -- accidentally was overwriting bplxmod values
 
     // The bitplane modulo registers for odd bitplanes
     i16 bpl1mod = 0;
