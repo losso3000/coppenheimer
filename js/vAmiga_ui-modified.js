@@ -46,8 +46,11 @@ let v_fire=null;
 let fixed_touch_joystick_base=false;
 let stationaryBase = false;
 
-var MEM_HPIXELS=704;
-var MEM_VPIXELS=806;
+const MEMDUMP_MIN_W = 752;
+const MEMDUMP_MIN_H = 806;
+
+var MEM_HPIXELS=MEMDUMP_MIN_W;
+var MEM_VPIXELS=MEMDUMP_MIN_H;
 var MEMPREVIEW_HPIXELS=256;
 var MEMPREVIEW_VPIXELS=256;
 var memdump_col1 = 0xffdf942a;
@@ -568,7 +571,15 @@ function memdump_dragging(pos) {
 	memdump_do(pos, memdump_col1 ^ 0x77000000, memdump_col2 ^ 0x77000000);
 }
 function memdump_do(start0,col1,col2) {
-	if (!memdump_buffer) {
+	if (!memdump_buffer || memdump_buffer.length != memimage_data.width * memimage_data.height * 4) {
+		let msg = `weird: memdump_buffer ${memdump_buffer ? "size mismatch" : "was null"}, ` + 
+			`creating array of size ${MEM_HPIXELS} * ${MEM_VPIXELS} * 4 = ${MEM_HPIXELS*MEM_VPIXELS*4}\n` +
+			`memimage_data.width * memimage_data.height = ${memimage_data.width} * ${memimage_data.height}; w*h*4=${memimage_data.width*memimage_data.height*4})\n` +
+			`MEM_HPIXELS * MEM_VPIXELS                  = ${MEM_HPIXELS} * ${MEM_VPIXELS}; MEM_HPIXELS*MEM_VPIXELS*4=${MEM_HPIXELS*MEM_VPIXELS*4})`;
+		if (memdump_buffer) {
+			msg += `\nold memdump_buffer.length was ${memdump_buffer.length} instead of ${memimage_data.width*memimage_data.height*4}`;
+		}
+		console.error(msg)
 		memdump_buffer = new Uint8Array(MEM_HPIXELS*MEM_VPIXELS*4);
 	}
 	let start = (start0 < 0) ? 0 : start0;
@@ -1294,6 +1305,7 @@ function InitWrappers() {
     }
 	memctx = document.getElementById('memcanvas').getContext('2d');
 	memimage_data = memctx.createImageData(MEM_HPIXELS,MEM_VPIXELS);
+	memdump_buffer = new Uint8Array(MEM_HPIXELS*MEM_VPIXELS*4);
 
 	mempreview_ctx = document.getElementById('mempreview').getContext('2d');
 	mempreview_image_data = memctx.createImageData(MEMPREVIEW_HPIXELS,MEMPREVIEW_VPIXELS);
@@ -1450,14 +1462,14 @@ function setColorScheme(val) {
 			let availableW = innerW - rect.left - 8;
 			let availableH = innerH - rect.top - 72;
 			availableW = (availableW-4) & 0xfff0;
-			if (availableW < 752) availableW = 752;
-			if (availableH < 320) availableH = 320;
+			if (availableW < MEMDUMP_MIN_W) availableW = MEMDUMP_MIN_W;
+			if (availableH < MEMDUMP_MIN_H) availableH = MEMDUMP_MIN_H;
 			document.getElementById("memcanvas").width  = availableW;
 			document.getElementById("memcanvas").height = availableH;
 			MEM_HPIXELS = availableW;
 			MEM_VPIXELS = availableH;
 			memimage_data = memctx.createImageData(MEM_HPIXELS,MEM_VPIXELS);
-			memdump_buffer = null;
+			memdump_buffer = new Uint8Array(MEM_HPIXELS*MEM_VPIXELS*4);
 			memdump();
 		} catch (e) {
 			console.warn("canvas resize handler oopsie", e);
