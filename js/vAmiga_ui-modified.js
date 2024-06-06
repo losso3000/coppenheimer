@@ -1466,8 +1466,9 @@ function setColorScheme(val) {
 			if (availableH < MEMDUMP_MIN_H) availableH = MEMDUMP_MIN_H;
 			document.getElementById("memcanvas").width  = availableW;
 			document.getElementById("memcanvas").height = availableH;
-			MEM_HPIXELS = availableW;
-			MEM_VPIXELS = availableH;
+			MEM_HPIXELS = Math.round(availableW);
+			MEM_VPIXELS = Math.round(availableH);
+			console.info(`resize event: using ${MEM_HPIXELS} * ${MEM_VPIXELS} as canvas/buffer size`)
 			memimage_data = memctx.createImageData(MEM_HPIXELS,MEM_VPIXELS);
 			memdump_buffer = new Uint8Array(MEM_HPIXELS*MEM_VPIXELS*4);
 			memdump();

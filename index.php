@@ -6,7 +6,7 @@
 // - includes register-sw.js, shell-init.js and keeps this file somewhat small
 // - after build, run "php -S 0.0.0.0:3000" or something
 
-define("COPPENHEIMER_VERSION", "0.1.0-alpha2");
+define("COPPENHEIMER_VERSION", "0.1.0-alpha3");
 define("COPPENHEIMER_TIMESTAMP", "2024-06-06");
 
 ?><!DOCTYPE html>
