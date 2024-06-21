@@ -6,8 +6,8 @@
 // - includes register-sw.js, shell-init.js and keeps this file somewhat small
 // - after build, run "php -S 0.0.0.0:3000" or something
 
-define("COPPENHEIMER_VERSION", "0.1.0-alpha3");
-define("COPPENHEIMER_TIMESTAMP", "2024-06-06");
+define("COPPENHEIMER_VERSION", "0.1.1");
+define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 
 ?><!DOCTYPE html>
 <html>
@@ -97,6 +97,17 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-06");
 		<div class="d-vflex">
 			<p>Please select a Kickstart ROM or load a snapshot to get started.<br>Kickstart 1.3 recommended!</p>
 			<button class="button-select-rom w-mid vpad">Kickstart ROM…</button>
+			<button class="button-snapshot-from-url w-mid vpad" data-fetch-aros="true" data-url="snapshots/transhuman_snapshot_M3fd8W40.vAmiga">Demo: Transhuman</button>
+			<button class="button-snapshot-from-url w-mid vpad" data-fetch-aros="true" data-url="snapshots/9fingers_snapshot_M1a396W44.vAmiga">Demo: 9 Fingers</button>
+			<button class="button-snapshot-from-url w-mid vpad" data-fetch-aros="true" data-url="snapshots/Rink_a_Dink_snapshot_M6002cW42.vAmiga">Demo: Rink-A-Dink</button>
+		</div>
+		<div class="dialog-bottom">
+			<button class="js-close-containing-dialog">Close</button>
+		</div>
+	</dialog>
+	<dialog id="dialog-examples">
+		<h2>Example snapshots</h2>
+		<div class="d-vflex">
 			<button class="button-snapshot-from-url w-mid vpad" data-fetch-aros="true" data-url="snapshots/transhuman_snapshot_M3fd8W40.vAmiga">Demo: Transhuman</button>
 			<button class="button-snapshot-from-url w-mid vpad" data-fetch-aros="true" data-url="snapshots/9fingers_snapshot_M1a396W44.vAmiga">Demo: 9 Fingers</button>
 			<button class="button-snapshot-from-url w-mid vpad" data-fetch-aros="true" data-url="snapshots/Rink_a_Dink_snapshot_M6002cW42.vAmiga">Demo: Rink-A-Dink</button>
@@ -282,12 +293,6 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-06");
 						<input id="playfield2" class="layer" type="checkbox"><label for="playfield2">Disable playfield 2</label>
 						<input id="checkbox-mute" class="layer" type="checkbox"><label for="checkbox-mute">Mute</label>
 					</div>
-					<div>
-						<button class="button-snapshot-from-url w-mid vpad" data-url="snapshots/transhuman_snapshot_M3fd8W40.vAmiga">Demo: Transhuman</button>
-						<button class="button-snapshot-from-url w-mid vpad" data-url="snapshots/9fingers_snapshot_M1a396W44.vAmiga">Demo: 9 Fingers</button>
-						<button class="button-snapshot-from-url w-mid vpad" data-url="snapshots/Rink_a_Dink_snapshot_M6002cW42.vAmiga">Demo: Rink-A-Dink</button>
-						<span style="padding-top:4px"><strong>←</strong> Examples</span>
-					</div>
 					<!--
 						Auto snapshots
 						Sprite collisions
@@ -306,7 +311,10 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-06");
 								<div>Realtime Amiga monitor</div>
 								<div>Powered by vAmiga and vAmigaWeb</div>
 							</div>
-							<button id="button-about" class="w-mid">About</button>
+							<div class="d-flex">
+								<button id="button-about" class="d-col">About</button>
+								<button id="button-examples" class="d-col">Examples</button>
+							</div>
 						</div>
 					</div>
 				</div>

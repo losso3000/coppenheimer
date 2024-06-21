@@ -2568,6 +2568,9 @@ $('.layer').change( function(event) {
 	document.getElementById("button-about").addEventListener("click", function(e) {
 		document.getElementById("dialog-about").showModal();
 	});
+	document.getElementById("button-examples").addEventListener("click", function(e) {
+		document.getElementById("dialog-examples").showModal();
+	});
 	document.getElementById("button-debugger").addEventListener("click", function(e) {
 		if (is_running()) doPause();
 
