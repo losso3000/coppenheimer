@@ -1,33 +1,3 @@
-      let light_mode = true;
-      if(window.location.href.indexOf('#dark=false') >=0)
-      {
-        light_mode=true;
-      }
-      else if(window.location.href.indexOf("#")>0)
-      { 
-        let param_part = decodeURIComponent(window.location.href.substring(window.location.href.indexOf("#")));
-        
-        let start_pos=param_part.indexOf('#{');        
-        if(start_pos == 0 && param_part.endsWith('}'))
-        {
-          try {
-            let dark_conf = JSON.parse(param_part.substring(1)).dark;
-            light_mode = dark_conf !== undefined && dark_conf == false;
-          } catch(e) {
-            console.error(`error in JSON preconfig parameter: ${param_part}`);
-            console.error(e);
-            alert(`error in JSON preconfig parameter: \n${e}`); 
-          }
-          
-        }
-      }
-      if(light_mode)
-      {
-        $("#canvas").css("background-color", "var(--lighterbg)");
-        $("body").removeAttr( "data-theme").css("background-color", "var(--lighterbg) !important");
-      }
-
-
       is_inside_scrollable=(e)=>{
         let inside_modal=false;
         let el=e.target; 
