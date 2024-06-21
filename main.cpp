@@ -1842,6 +1842,47 @@ extern "C" i64 wasm_get_config_item(char* item_name, unsigned data)
   }
 }
 
+extern "C" const char* wasm_configure_key(char* option, char* key, char* _value)
+{
+  sprintf(config_result,""); 
+  auto value = std::string(_value);
+  if(log_on) printf("wasm_configure_key %s %s = %s\n", option, key, value.c_str());
+
+  try {
+/*
+    setFallback(OPT_DMA_DEBUG_ENABLE, false);
+    setFallback(OPT_DMA_DEBUG_MODE, DMA_DISPLAY_MODE_FG_LAYER);
+    setFallback(OPT_DMA_DEBUG_OPACITY, 50);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_COPPER, true);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_BLITTER, true);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_DISK, true);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_AUDIO, true);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_SPRITE, true);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_BITPLANE, true);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_CPU, false);
+    setFallback(OPT_DMA_DEBUG_CHANNEL, DMA_CHANNEL_REFRESH, true);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_COPPER, 0xFFFF0000);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_BLITTER, 0xFFCC0000);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_DISK, 0x00FF0000);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_AUDIO, 0xFF00FF00);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_SPRITE, 0x0088FF00);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_BITPLANE, 0x00FFFF00);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_CPU, 0xFFFFFF00);
+    setFallback(OPT_DMA_DEBUG_COLOR, DMA_CHANNEL_REFRESH, 0xFF000000);
+*/
+      if (strcmp(option,"DMA_DEBUG_CHANNEL") == 0 )
+      {
+        wrapper->amiga->configure(util::parseEnum <OptionEnum>(std::string(option)), util::parseEnum <DmaChannelEnum>(std::string(key)), util::parseBool(value)); 
+      }
+  }
+  catch(VAError &exception) {    
+//    ErrorCode ec=exception.data;
+//    sprintf(config_result,"%s", ErrorCodeEnum::key(ec));
+    sprintf(config_result,"%s", exception.what());
+  }
+  return config_result; 
+}
+
 extern "C" const char* wasm_configure(char* option, char* _value)
 {
   sprintf(config_result,""); 
@@ -1923,6 +1964,10 @@ extern "C" const char* wasm_configure(char* option, char* _value)
     )
     {
       wrapper->amiga->configure(util::parseEnum <OptionEnum>(std::string(option)), util::parseNum(value));
+    }
+    else if ( strcmp(option,"DMA_DEBUG_CHANNEL") == 0 )
+    {
+      wrapper->amiga->configure(util::parseEnum <OptionEnum>(std::string(option)),  util::parseBool(value));
     }
     else
     {
@@ -2007,13 +2052,6 @@ extern "C" void wasm_write_byte_to_ser(u8 byte_to_send)
     wrapper->amiga->remoteManager.serServer.processIncomingByte(byte_to_send);
 }
 
-
-extern "C" double wasm_activity()
-{
-    auto dma = wrapper->amiga->agnus.getStats();
-    return dma.blitterActivity;
-}
-
 extern "C" const char* wasm_shell(char *chars)
 {
     // printf("main.cpp: wasm_shell(\"%s\")\n", chars);
@@ -2056,4 +2094,73 @@ extern "C" char* wasm_first_bpl_info(int line)
         agnus->bplptFirst[line][5]
     );  
     return buffer;
+}
+
+extern "C" double wasm_activity(u8 id, u8 read_or_write)
+{
+    double value=0.0;
+    auto dma = wrapper->amiga->agnus.getStats();
+    if(id==0)
+      value= dma.copperActivity /(313 *120);
+    else if(id==1)
+      value= dma.blitterActivity /(313 *120);
+    else if(id==2)
+      value= dma.diskActivity /(313 *3);
+    else if(id==3)
+      value= dma.audioActivity /(313 *4);
+    else if(id==4)
+      value= dma.spriteActivity /(313 *16);
+    else if(id==5)
+      value= dma.bitplaneActivity /(39330);
+    else if(id==6)
+    {
+      /* let mem = amiga.mem.getStats()
+        let max = Float((HPOS_CNT_PAL * VPOS_CNT) / 2)
+        let chipR = Float(mem.chipReads.accumulated) / max
+        let chipW = Float(mem.chipWrites.accumulated) / max
+        let slowR = Float(mem.slowReads.accumulated) / max
+        let slowW = Float(mem.slowWrites.accumulated) / max
+        let fastR = Float(mem.fastReads.accumulated) / max
+        let fastW = Float(mem.fastWrites.accumulated) / max
+        let kickR = Float(mem.kickReads.accumulated) / max
+        let kickW = Float(mem.kickWrites.accumulated) / max
+        
+        addValues(Monitors.Monitor.chipRam, chipR, chipW)
+        addValues(Monitors.Monitor.slowRam, slowR, slowW)
+        addValues(Monitors.Monitor.fastRam, fastR, fastW)
+        addValues(Monitors.Monitor.kickRom, kickR, kickW)*/
+        auto mem = wrapper->amiga->mem.getStats();
+        auto max = float(HPOS_CNT_PAL * VPOS_CNT) / 2.0;
+        value = float(
+          read_or_write == 0 ? mem.chipReads.accumulated : mem.chipWrites.accumulated
+          )  / max;
+    }
+    else if(id==7)
+    {
+        auto mem = wrapper->amiga->mem.getStats();
+        auto max = float(HPOS_CNT_PAL * VPOS_CNT) / 2.0;
+        value= float(
+          read_or_write == 0 ? mem.slowReads.accumulated : mem.slowWrites.accumulated
+          )  / max;
+    }
+    else if(id==8)
+    {
+        auto mem = wrapper->amiga->mem.getStats();
+        auto max = float(HPOS_CNT_PAL * VPOS_CNT) / 2.0;
+        value = float(
+          read_or_write == 0 ? mem.fastReads.accumulated : mem.fastWrites.accumulated
+          )  / max;
+    }
+    else if(id==9)
+    {
+        auto mem = wrapper->amiga->mem.getStats();
+        auto max = float(HPOS_CNT_PAL * VPOS_CNT) / 2.0;
+        value = float(
+          read_or_write == 0 ? mem.kickReads.accumulated : mem.kickWrites.accumulated
+          )  / max;
+    }
+
+  //  printf("activity_id: %u, rw: %u =%lf\n",id, read_or_write,value);
+
+    return value;
 }

@@ -1733,6 +1733,7 @@ function InitWrappers() {
     wasm_eject_disk = Module.cwrap('wasm_eject_disk', 'undefined', ['string']);
     wasm_export_disk = Module.cwrap('wasm_export_disk', 'string', ['string']);
     wasm_configure = Module.cwrap('wasm_configure', 'string', ['string', 'string']);
+    wasm_configure_key = Module.cwrap('wasm_configure_key', 'string', ['string', 'string', 'string']);
     wasm_write_string_to_ser = Module.cwrap('wasm_write_string_to_ser', 'undefined', ['string']);
     wasm_print_error = Module.cwrap('wasm_print_error', 'undefined', ['number']);
     wasm_power_on = Module.cwrap('wasm_power_on', 'string', ['number']);
@@ -2409,9 +2410,6 @@ function InitWrappers() {
         menu_button_fade_in();
     }});
 
-
-
-
 //----
     lock_action_button_switch = $('#lock_action_button_switch');
     lock_action_button=load_setting('lock_action_button', false);
@@ -2420,8 +2418,30 @@ function InitWrappers() {
         lock_action_button=this.checked;
         install_custom_keys();
         save_setting('lock_action_button', lock_action_button);
+        $('#move_action_buttons_switch').prop('checked',!lock_action_button);
     });
-//----
+
+    $('#move_action_buttons_switch').prop('checked',!lock_action_button);
+
+    let set_move_action_buttons_label=()=>{
+        $('#move_action_buttons_label').html(
+            lock_action_button ? 
+            `All <span>'action button' positions are now locked</span>… <span>scripts can trigger actions when the button is released</span>… <span>long press edit mode is disabled</span> (instead use the <span>+</span> from the top menu bar and choose any buttons from the dropdown to edit)`
+            :
+            `Once created, you can <span>move any 'action button' by dragging</span>… A <span>long press will enter 'edit mode'</span>… While 'moveable action buttons' is switched on, <span>scripts can not detect release</span> state (to allow this, you must disable the long press gesture by turning 'moveable action buttons' off)`
+        );
+    }
+    set_move_action_buttons_label();
+    $('#move_action_buttons_switch').change( 
+        ()=>{
+                lock_action_button=!lock_action_button;
+                set_move_action_buttons_label();
+                install_custom_keys();
+                lock_action_button_switch.prop('checked', lock_action_button);
+            }
+    ); 
+
+    //----
 let set_game_controller_buttons_choice = function (choice) {
     $(`#button_game_controller_type_choice`).text('button count='+choice);
     joystick_button_count=choice;
@@ -2682,6 +2702,27 @@ $(`#choose_display a`).click(function ()
 
 //----------
 
+activity_monitor_switch
+
+activity_monitor_switch = $('#activity_monitor_switch');
+set_activity_monitor = function(value){
+    if(value)
+    {
+        show_activity();
+    }
+    else
+    {
+        hide_activity(); 
+    }
+    activity_monitor_switch.prop('checked', value);
+}    
+set_activity_monitor(load_setting('activity_monitor', false));
+activity_monitor_switch.change( function() {
+    
+    save_setting('activity_monitor', this.checked);
+    set_activity_monitor(this.checked);
+});
+//----------
     pixel_art_switch = $('#pixel_art_switch');
     set_pixel_art = function(value){
         if(value)
@@ -4052,7 +4093,6 @@ $('.layer').change( function(event) {
                 button_delete_shortcut.prop('disabled',btn_def.key == "");
                 $('#button_padding').prop('disabled', btn_def.title=='');
                 $('#button_opacity').prop('disabled', btn_def.title=='');
-     
                 //show errors
                 validate_action_script();
             }
@@ -4078,7 +4118,6 @@ $('.layer').change( function(event) {
                 $('#check_app_scope').change( set_scope_label ); 
             }
 
-            
             if(is_running())
             {
                 wasm_halt();
@@ -4135,7 +4174,7 @@ $('.layer').change( function(event) {
             $('#add_timer_action a').click(on_add_action);
             
             //system action
-            var list_actions=['toggle_run', 'take_snapshot', 'restore_last_snapshot', 'swap_joystick', 'keyboard', 'fullscreen', 'menubar', 'pause', 'run', 'clipboard_paste', 'warp_always', 'warp_never', 'warp_auto'];
+            var list_actions=['toggle_run','toggle_warp','take_snapshot', 'restore_last_snapshot', 'swap_joystick', 'keyboard', 'fullscreen', 'menubar', 'pause', 'run', 'clipboard_paste', 'warp_always', 'warp_never', 'warp_auto', 'activity_monitor', 'toggle_action_buttons'];
             html_action_list='';
             list_actions.forEach(element => {
                 html_action_list +='<a class="dropdown-item" href="#">'+element+'</a>';
@@ -4373,8 +4412,10 @@ release_key('ControlLeft');`;
                 }
                 custom_keys.push(new_button);
 
-                $('#lock_action_button_switch').prop('checked', false);
                 lock_action_button=false;
+                $('#lock_action_button_switch').prop('checked', lock_action_button);
+                $('#move_action_buttons_switch').prop('checked',!lock_action_button);
+
 
                 install_custom_keys();
                 create_new_custom_key=false;
@@ -4475,7 +4516,10 @@ release_key('ControlLeft');`;
             {
                 btn_html += 'opacity:'+element.opacity+' !important;';
             }
-
+            if(!lock_action_button)
+            {
+                btn_html += 'box-shadow: 0.2em 0.2em 0.6em rgba(0, 0, 0, 0.9);';
+            }
 
             btn_html += 'touch-action:none">'+html_encode(element.title)+'</button>';
 
@@ -4685,7 +4729,7 @@ release_key('ControlLeft');`;
 
         if(!just_dragged)
         {
-            const magnetic_force=5.3;
+            const magnetic_force=5.25;
             just_dragged = Math.abs(xOffset[e.target.id]-currentX)>magnetic_force || Math.abs(yOffset[e.target.id]-currentY)>magnetic_force;
         }
         if(just_dragged)
@@ -4848,29 +4892,6 @@ function hide_all_tooltips()
     $('[data-toggle="tooltip"]').tooltip('hide');
 }
     
-let activity_intervall=null;
-function show_activity()
-{
-    $("#activity").html(
-`
-<div style="height: 100vh;width: 70vw;display: grid;grid-template-columns: repeat(12, 1fr);grid-template-rows: repeat(100, 1fr);grid-column-gap: 5px;">
-  <div style="grid-row: 1 / 50;border-radius: 5px 5px 0 0;background-color: #ff4136"></div>
-  <div style="grid-row: 1 / 60;border-radius: 5px 5px 0 0;background-color: #ff4136"></div>
-  <div style="grid-row: 1 / 70;border-radius: 5px 5px 0 0;background-color: #ff4136"></div>
-  <div style="grid-row: 1 / 80;border-radius: 5px 5px 0 0;background-color: #ff4136"></div>
-</div>`
-);
-    activity_intervall = setInterval(()=>{
-        //let a=_wasm_activity();
-        //$("#activity").text(`${(a ).toFixed(2)}`);
-    },100);
-}
-function hide_activity()
-{
-    $("#activity").html(``);
-    clearInterval(activity_intervall);
-}
-
 add_pencil_support = (element) => {
     let isPointerDown = false;
     let pointerId = null;
@@ -4920,4 +4941,258 @@ function add_pencil_support_for_elements_which_need_it()
     {
         add_pencil_support(document.getElementById(element_id));
     }
+}
+
+function copy_to_clipboard(element) {
+    var textToCopy = element.innerText;
+    navigator.clipboard.writeText(textToCopy).then(function() {
+        alert(`copied to clipboard: ${textToCopy}`);
+    }, function(err) {
+        console.error(err);
+    });
+}
+
+//--- activity monitors and dma bus visualisation
+let activity_intervall=null;
+
+function add_monitor(id, label, splitted=false)
+{
+    $("#activity").append(
+    `
+        <div>
+            <div id="monitor_${id}" class="monitor"></div>
+            <div class="monitor_label">${label}</div>
+        <div>
+    `
+    );
+
+    color=[];
+    color.copper={start: '51,51,0', end:'255,255,0'}
+    color.blitter={start: `50,${parseInt('cc',16)*0.2},0`, end:`${parseInt('ff',16)},${parseInt('cc',16)},0`}
+    color.disk={start: `0,51,0`, end:`0,255,0`}
+    color.audio={start: '50,0,50', end:'255,0,255'}
+    color.sprite={start: `0,${parseInt('88',16)*0.2},51`, end:`0,${parseInt('88',16)},255`}
+    color.bitplane={start: '0,50,50', end:'0,255,255'}
+    color.CPU={start: '50,50,50', end:'255,255,255'}
+
+
+    document.querySelector(`#monitor_${id}`).addEventListener('click', 
+        (e)=>{
+            let id=e.currentTarget.id.replace('monitor_','');
+            if(id.includes("Ram") || id.includes("Rom"))
+                id="CPU";
+            
+            if(dma_channels[id] !==true )
+            {
+                e.currentTarget.style.setProperty("--color_start",color[id].start);
+                e.currentTarget.style.setProperty("--color_end",color[id].end);   
+            }
+            else
+            {
+                e.currentTarget.style.setProperty("--color_start",'50,50,50');
+                e.currentTarget.style.setProperty("--color_end",'200,200,200');   
+            }
+            dma_debug(id);
+        }
+    );
+    dma_channel_history[id] = [];
+    dma_channel_history_values[id] = [];
+    for(let i=0;i<20;i++)
+    {
+        if(splitted==false)
+        {
+            $(`#monitor_${id}`).append(
+                `<div id="${id}_bar_${i}" class="bar" 
+                  style="--barval:0;grid-column:${i+1};"></div>`
+            );
+            dma_channel_history[id].push(document.querySelector(`#${id}_bar_${i}`));
+            dma_channel_history_values[id].push(0);
+        }
+        else
+        {
+            $(`#monitor_${id}`).append(
+                `<div id="${id}_bar_${i}_upper" class="bar_splitted_upper" 
+                  style="--barval:0;grid-column:${i+1};"></div>`
+            );
+            $(`#monitor_${id}`).append(
+                `<div id="${id}_bar_${i}_lower" class="bar_splitted_lower" 
+                  style="--barval:0;grid-column:${i+1};"></div>`
+            );
+            dma_channel_history[id].push(
+                [
+                    document.querySelector(`#${id}_bar_${i}_upper`),
+                    document.querySelector(`#${id}_bar_${i}_lower`)
+                ]
+            );
+            dma_channel_history_values[id].push([0,0]);
+        }
+        
+    }
+
+    const activity_id = {
+        copper: 0,
+        blitter: 1,
+        disk: 2,
+        audio: 3,
+        sprite: 4,
+        bitplane: 5,
+        chipRam: 6,
+        slowRam: 7,
+        fastRam: 8,
+        kickRom: 9,
+        waveformL:10, waveformR:11
+    }
+
+    if(!activity_intervall)
+    {
+        activity_intervall = setInterval(()=>{
+            if(!running) return;
+            
+            for(id in dma_channels){
+                if(dma_channel_history[id]===undefined)
+                    continue;
+                let value=_wasm_activity(activity_id[id]);
+                value = (Math.log(1+19*value) / Math.log(20)) * 100;
+                value = value>100 ? 100: Math.round(value);
+
+                if(Array.isArray(dma_channel_history[id][0]))
+                {
+                    for(let i=0;i<20-1;i++)
+                    {
+                        let newer_upper_value=dma_channel_history_values[id][i+1][0];
+                        if(dma_channel_history_values[id][i][0] !==newer_upper_value)
+                        {
+                            dma_channel_history[id][i][0].style.setProperty("--barval", newer_upper_value);
+                            dma_channel_history_values[id][i][0]=newer_upper_value;
+                        }
+
+                        let newer_lower_value=dma_channel_history_values[id][i+1][1];
+                        if(dma_channel_history_values[id][i][1] !==newer_lower_value)
+                        {
+                            dma_channel_history[id][i][1].style.setProperty("--barval", newer_lower_value);
+                            dma_channel_history_values[id][i][1]=newer_lower_value;
+                        }
+                    }
+
+                    if(value !== dma_channel_history_values[id][20-1][0])
+                    {    
+                        dma_channel_history_values[id][20-1][0]= value;           
+                        dma_channel_history[id][20-1][0].style.setProperty("--barval", value);
+                    }
+
+                    value=_wasm_activity(activity_id[id],1);
+                    value = (Math.log(1+19*value) / Math.log(20)) * 100;
+                    value = value>100 ? 100: Math.round(value);    
+                    if(value !== dma_channel_history_values[id][20-1][1])
+                    {         
+                        dma_channel_history_values[id][20-1][1]= value;  
+                        dma_channel_history[id][20-1][1].style.setProperty("--barval", value);
+                    }
+                }
+                else
+                {
+                    for(let i=0;i<20-1;i++)
+                    {
+                        let newer_value = dma_channel_history_values[id][i+1];
+                        if(dma_channel_history_values[id][i] !== newer_value)
+                        {
+                            dma_channel_history[id][i].style.setProperty("--barval", newer_value);
+                            dma_channel_history_values[id][i]=newer_value;
+                        }
+                    }
+                    if(value !== dma_channel_history_values[id][20-1])
+                    {
+                        dma_channel_history_values[id][20-1]= value;
+                        dma_channel_history[id][20-1].style.setProperty("--barval", value);
+                    }
+                }
+            }
+        },400);
+    }
+}
+
+
+function show_activity()
+{
+    $("#activity_help").show();
+
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "COPPER", "0");
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "BLITTER", "0");
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "DISK", "0");
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "AUDIO", "0");
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "SPRITE", "0");
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "BITPLANE", "0");
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "CPU", "0");
+    wasm_configure_key("DMA_DEBUG_CHANNEL", "REFRESH", "0");
+
+
+    dma_channels={
+        copper: false,
+        blitter: false,
+        disk:false,
+        audio:false,
+        sprite:false,
+        bitplane:false,
+        chipRam:false,
+        slowRam:false,
+        fastRam:false,
+        kickRom:false,
+
+    };
+
+
+    wasm_configure("DMA_DEBUG_ENABLE","1");
+
+    $("#activity").remove();
+    $("body").append(`<div id="activity" class="monitor_grid"></div>`);
+
+    dma_channel_history = [];
+    dma_channel_history_values = [];
+
+    add_monitor("blitter", "Blitter DMA");
+    add_monitor("copper", "Copper DMA");
+    add_monitor("disk", "Disk DMA");
+    add_monitor("audio", "Audio DMA");
+    add_monitor("sprite", "Sprite DMA");
+    add_monitor("bitplane", "Bitplane DMA");
+    add_monitor("chipRam", "CPU (chipRAM)", true);
+    add_monitor("slowRam", "CPU (slowRAM)", true);
+    add_monitor("fastRam", "CPU (fastRAM)", true);
+    add_monitor("kickRom", "CPU (kickROM)", true);
+
+ }
+function hide_activity()
+{
+    wasm_configure("DMA_DEBUG_ENABLE","0");
+
+    $("#activity").remove();
+    clearInterval(activity_intervall);
+    activity_intervall=null;
+    $("#activity_help").hide();
+}
+
+function dma_debug(channel)
+{
+/**
+ * activity monitor on => all aktivity monitorings are enabled 
+ * they will be rendered black and white
+ * on touch werden they become colored and the dma bus activity will be visualized (dma debugger)
+ * again touch and they become black white  and dma channel visualisation on that particular channel will be disabled
+ 
+Settings
+ (x) activity monitor
+ (x?) tap on monitor to visualise dma channel
+*/
+    if(channel.includes("Ram") || channel.includes("Rom"))
+        channel="CPU";
+
+
+    if(dma_channels[channel]=== undefined)
+    {
+        dma_channels[channel]=false;
+    }
+
+    dma_channels[channel]=!dma_channels[channel];
+   
+    wasm_configure_key("DMA_DEBUG_CHANNEL", channel, dma_channels[channel] ? "1" : "0");
 }
