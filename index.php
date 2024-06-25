@@ -80,6 +80,8 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 	#button-pause span{float:right;}
 	.hide-paused,.paused .show-paused{display:inline;}
 	.show-paused,.paused .hide-paused{display:none;}
+	summary{cursor:pointer;padding:2px;border-bottom:2px solid var(--dark);margin-bottom:2px;}
+	.monitor{height:64px;width:116px;}
 	</style>
 	<script>
 	var COPPENHEIMER_VERSION = "<?php echo COPPENHEIMER_VERSION; ?>";
@@ -291,14 +293,6 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 						<input id="playfield2" class="layer" type="checkbox"><label for="playfield2">Disable playfield 2</label>
 						<input id="checkbox-mute" class="layer" type="checkbox"><label for="checkbox-mute">Mute</label>
 					</div>
-					<!--
-						Auto snapshots
-						Sprite collisions
-						Playfield collisions
-						Agnus
-						Denise
-						Prev snapshot
-					-->
 					<div class="d-col">
 					</div>
 					<div>
@@ -322,6 +316,30 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 						<input id="checkbox-livepreview" type="checkbox" checked="checked"><label for="checkbox-livepreview">Live overview (chip+fast)</label>
 					</div>
 				</div>
+			</div>
+			<div>
+				<details>
+					<summary>DMA usage</summary>
+					<div class="d-flex">
+						<div class="d-col"><canvas class="monitor" id="monitor-blitter"></canvas>Blitter</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-copper"></canvas>Copper</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-disk"></canvas>Disk</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-audio"></canvas>Audio</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-sprite"></canvas>Sprite</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-bitplane"></canvas>Bitplane</div>
+					</div>
+				</details>
+				<details>
+					<summary>CPU reads and writes</summary>
+					<div class="d-flex">
+						<div class="d-col"><canvas class="monitor" id="monitor-chip-r"></canvas>Chipmem reads</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-chip-w"></canvas>Chipmem writes</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-fast-r"></canvas>Fastmem reads</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-fast-w"></canvas>Fastmem writes</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-rom-r"></canvas>ROM reads</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-rom-w"></canvas>ROM writes</div>
+					</div>
+				</details>
 			</div>
 		</div>
 		<div id="mem-div">

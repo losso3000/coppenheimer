@@ -105,6 +105,74 @@ function checkSnapshotSetting() {
 */
 
 //
+// monitoring stuff
+//
+
+class MonitorThing {
+  constructor(selector) {
+    this.selector = selector;
+    this.checkVisibility();
+    this.canvas = null;
+    this.context = null;
+    this.values = [];
+  }
+  checkVisibility() {
+    this.visible = $(this.selector).closest("details").attr("open") == "open";
+    console.log(`ok checkVisibility of ${this.selector} = ${this.visible}`);
+    if (!this.visible) return;
+    this.canvas = $(this.selector);
+    this.w = Math.round(this.canvas.width());
+    this.h = Math.round(this.canvas.height());
+    console.log(`w,h of ${this.selector} is ${this.w},${this.h}`);
+    this.canvas.width(this.w).height(this.h);
+    this.canvas[0].width = this.w;
+    this.canvas[0].height = this.h;
+    if (this.context == null) {
+      this.context = this.canvas[0].getContext("2d");
+    }
+    this.repaint();
+  }
+  pushValue(value) {
+    if (this.values.unshift(value) >= this.w) {
+      this.values.pop();
+    }
+  }
+  repaint() {
+      this.context.fillStyle = "#706fbf";
+      this.context.fillRect(0,0,this.w,this.h);
+      this.context.fillStyle = "white";
+  }
+}
+
+var monitorBlitter  = new MonitorThing("#monitor-blitter");
+var monitorCopper   = new MonitorThing("#monitor-copper");
+var monitorDisk     = new MonitorThing("#monitor-disk");
+var monitorAudio    = new MonitorThing("#monitor-audio");
+var monitorSprite   = new MonitorThing("#monitor-sprite");
+var monitorBitplane = new MonitorThing("#monitor-bitplane");
+var monitorChipR    = new MonitorThing("#monitor-chip-r");
+var monitorChipW    = new MonitorThing("#monitor-chip-w");
+var monitorFastR    = new MonitorThing("#monitor-fast-r");
+var monitorFastW    = new MonitorThing("#monitor-fast-w");
+var monitorRomR     = new MonitorThing("#monitor-rom-r");
+var monitorRomW     = new MonitorThing("#monitor-rom-w");
+
+function checkMonitorVisibilities() {
+  monitorBlitter.checkVisibility();
+  monitorCopper.checkVisibility();
+  monitorDisk.checkVisibility();
+  monitorAudio.checkVisibility();
+  monitorSprite.checkVisibility();
+  monitorBitplane.checkVisibility();
+  monitorChipR.checkVisibility();
+  monitorChipW.checkVisibility();
+  monitorFastR.checkVisibility();
+  monitorFastW.checkVisibility();
+  monitorRomR.checkVisibility();
+  monitorRomW.checkVisibility();
+}
+
+//
 // sound
 //
 
@@ -2629,6 +2697,9 @@ $('.layer').change( function(event) {
 
 
 // Losso
+
+$("details").on("toggle", e => {checkMonitorVisibilities();});
+
 var lastShell = "";
 var shellInput = document.getElementById("retroshell-input");
 var shellOutput = document.getElementById("retroshell-output");
@@ -2652,7 +2723,6 @@ shellInput.addEventListener("keydown", (e) => {
 	initRomSelects();
 
     return;
-}
-
+} // InitWrappers
 
 //---- end custom key ----
