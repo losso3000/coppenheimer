@@ -75,6 +75,36 @@ var lastInsertedDisk={};
 var required_roms_loaded = false;
 
 //
+// auto snapshot stuff
+//
+
+/* TODO
+var auto_snapshot_enabled = false;
+var frames_without_snapshot = 0;
+var auto_snapshot_every = 50;
+function SlowRingBuffer(maxLength) {
+  this.maxLength = maxLength;
+}
+SlowRingBuffer.prototype = Object.create(Array.prototype);
+SlowRingBuffer.prototype.push = function(element) {
+  Array.prototype.push.call(this, element);
+  while (this.length > this.maxLength) {
+    this.shift();
+  }
+}
+var auto_snaps = new SlowRingBuffer(5);
+function checkSnapshotSetting() {
+  let setting = document.getElementById("auto-snapshots").value;
+  if (setting && parseInt(setting)) {
+    auto_snapshot_enabled = true;
+    auto_snapshot_every = parseInt(setting);
+  } else {
+    auto_snapshot_enabled = false;
+  }
+}
+*/
+
+//
 // sound
 //
 
@@ -656,20 +686,23 @@ function mempreviewset(x,y,argb) {
 	mempreview_buffer[MEMPREVIEW_HPIXELS*4*y + x*4 + 1] = 0xff & (argb >> 8); // G
 	mempreview_buffer[MEMPREVIEW_HPIXELS*4*y + x*4 + 2] = 0xff & (argb); // B
 }
-
+function setButtonPaused() {
+	$('#button-pause').addClass("paused");
+	$('#button-step').removeAttr("disabled");
+}
+function setButtonUnPaused() {
+	$('#button-pause').removeClass("paused");
+	$('#button-step').attr("disabled", "disabled");
+}
 function doPause() {
 	wasm_halt();
 	try { audioContext.suspend(); } catch(e){ console.error(e);}
 	running = false;
-	//set run icon
-	$('#button-pause').text("Run");
-	$('#button-step').removeAttr("disabled");
+	setButtonPaused();
 }
 function doUnpause() {
-	//set pause icon
-	$('#button-pause').text("Pause");
-	$('#button-step').attr("disabled", "disabled");
-	
+	setButtonUnPaused();
+
 	//have to catch an intentional "unwind" exception here, which is thrown
 	//by emscripten_set_main_loop() after emscripten_cancel_main_loop();
 	//to simulate infinity gamelloop see emscripten API for more info ... 
@@ -2360,8 +2393,9 @@ $('.layer').change( function(event) {
 	//
 	document.getElementById("button-snapshot").addEventListener("click", async function(e) {
 		e.preventDefault();
+		let name = shorten(global_apptitle.replace(/ M[0-9a-fA-F]+W[0-9]+/g, ""), 40);
 		// Encode current mem dump pos + width in snapshot title
-		let app_name = shorten(global_apptitle.replace(/ M[0-9a-fA-F]+W[0-9]+/g, ""), 40) + " M" + memdump_start.toString(16) + "W" + (memdump_word_width*2);
+		let app_name = name + " M" + memdump_start.toString(16) + "W" + (memdump_word_width*2);
 		wasm_halt();
 		wasm_take_user_snapshot();
 		var snapshot_json= wasm_pull_user_snapshot_file();
@@ -2377,7 +2411,7 @@ $('.layer').change( function(event) {
 		$("#button-snapshot").text("Saved!");
 		setTimeout(function() {$("#button-snapshot").text("Take snapshot");}, 500);
 		if(is_running()) {
-			setTimeout(function(){ try{wasm_run();} catch(e) {} },200);
+			setTimeout(function(){ try{wasm_run();} catch(e) {} },1);
 		}
 	});
 	async function getSnapshots(callback) {

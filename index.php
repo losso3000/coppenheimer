@@ -76,6 +76,10 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 	#snapshot-list{overflow:auto;max-height:67vh;}
 	#retroshell-input{font-family:monospace;}
 	#retroshell-output{width:1024px;height:67vh;}
+	#button-pause img{vertical-align:bottom;}
+	#button-pause span{float:right;}
+	.hide-paused,.paused .show-paused{display:inline;}
+	.show-paused,.paused .hide-paused{display:none;}
 	</style>
 	<script>
 	var COPPENHEIMER_VERSION = "<?php echo COPPENHEIMER_VERSION; ?>";
@@ -245,7 +249,7 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 				<div id="maincontrols" class="d-vflex">
 					<div>
 						<button id="button-reset" class="w-mid">Reset</button>
-						<button id="button-pause" class="w-mid">Pause</button>
+						<button id="button-pause" class="w-mid"><img width="9" height="14" class="show-paused" src="img/play.png"><img width="9" height="14" class="hide-paused" src="img/pause.png"><span class="show-paused">Paused</span><span class="hide-paused">Running</span></button>
 						<button id="button-step"  class="w-mid" disabled>Step</button>
 						<input id="checkbox-warp" type="checkbox"><label for="checkbox-warp">Warp</label>
 					</div>
@@ -260,18 +264,12 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 						<select id="port1" class="w-mid" data-toggle="tooltip" data-placement="left" title="game port 1">
 							<option value="none">Game port 1</option>
 							<option value="keys">cursor key (move) space (fire)</option>
-							<!--option value="touch">touch joystick (move|fire)</option>-->
 							<option value="mouse">mouse </option>
-							<!--<option value="mouse touchpad">mouse touchpad (btn|move|btn)</option>-->
-							<!--<option value="mouse touchpad2">mouse touchpad (move|btn/btn)</option>-->
 						</select>
 						<select id="port2" class="w-mid" data-toggle="tooltip" data-placement="left" title="game port 2">
 							<option value="none">Game port 2</option>
 							<option value="keys">cursor key (move) space (fire)</option>
-							<!--<option value="touch">touch joystick (move|fire)</option>-->
 							<option value="mouse">mouse</option>
-							<!--<option value="mouse touchpad">mouse touchpad (btn|move|btn)</option>-->
-							<!--<option value="mouse touchpad2">mouse touchpad (move|btn/btn)</option>-->
 						</select>
 						<div id="power-led" class="d-col hw-led lowered-border"></div>
 					</div>
