@@ -177,16 +177,15 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-26");
 	</dialog>
 	<dialog id="dialog-about">
 		<h2>Coppenheimer</h2>
-		<p>Version <?php echo COPPENHEIMER_VERSION; ?> (<?php echo COPPENHEIMER_TIMESTAMP; ?>)</p>
+		<p>An alternative UI for vAmigaWeb. Version <?php echo COPPENHEIMER_VERSION; ?> (<?php echo COPPENHEIMER_TIMESTAMP; ?>)</p>
 		<div class="lowered-border" style="padding:0 16px">
-			<p>An alternative UI for vAmigaWeb and some vAmiga patches – because I was jealous of <a href="https://sourceforge.net/projects/c64-debugger/" target="_blank">C64 65XE NES Debugger</a> and the likes.</p>
-			<p>Read all about it on <a href="https://heckmeck.de/amigastyle/coppenheimer/" target="_blank">heckmeck.de</a>.</p>
+			<!--<p>An alternative UI for vAmigaWeb and some vAmiga patches – because I was jealous of <a href="https://sourceforge.net/projects/c64-debugger/" target="_blank">C64 65XE NES Debugger</a> and the likes.</p>-->
+			<p>Release notes on <a href="https://github.com/losso3000/coppenheimer" target="_blank">GitHub</a>, some background on <a href="https://heckmeck.de/amigastyle/coppenheimer/" target="_blank">heckmeck.de</a>.</p>
 	 		<p><strong>Note:</strong> I did not write the emulator, or any of the cool stuff! <code>:)</code> Credits:</p>
 			<ul>
 				<li><a href="https://dirkwhoffmann.github.io/vAmiga/" target="_blank">vAmiga</a> by Dirk Hoffmann</li>
 				<li><a href="https://vamigaweb.github.io/doc/about.html" target="_blank">vAmigaWeb</a> by mithrendal</li>
 				<li>Using <a href="https://aros.sourceforge.io/introduction/ports.php#aros-amiga-m68k" target="_blank">AROS m68 replacement ROMS</a> by the AROS team</li>
-				<li>Repo with my modifications on <a href="https://github.com/losso3000/coppenheimer" target="_blank">GitHub</a></li>
 			</ul>
 			<p>To get started, you may try this:</p>
 			<ul>

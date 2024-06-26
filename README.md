@@ -8,6 +8,17 @@ Try! https://coppenheimer.heckmeck.de
 
 Why? https://heckmeck.de/amigastyle/coppenheimer/
 
+## Release notes
+
+* **0.2** (2024-06-26)
+  * Updates vAmigaWeb version
+  * Adds DMA and memory monitors
+  * More prominent play/pause button
+* **0.1.0-alpha3** (2024-06-06)
+  * Fixes Javascript error for "odd" screen DPI settings
+* **0.1.0-alpha1** (2024-05-24)
+  * Initial release
+
 ## Credits
 
 Forked from [vAmigaWeb](https://github.com/vAmigaWeb/vAmigaWeb), with
