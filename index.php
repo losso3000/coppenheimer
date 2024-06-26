@@ -6,8 +6,8 @@
 // - includes register-sw.js, shell-init.js and keeps this file somewhat small
 // - after build, run "php -S 0.0.0.0:3000" or something
 
-define("COPPENHEIMER_VERSION", "0.1.1");
-define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
+define("COPPENHEIMER_VERSION", "0.2");
+define("COPPENHEIMER_TIMESTAMP", "2024-06-26");
 
 ?><!DOCTYPE html>
 <html>
@@ -82,6 +82,7 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 	.show-paused,.paused .hide-paused{display:none;}
 	summary{cursor:pointer;padding:2px;border-bottom:2px solid var(--dark);margin-bottom:2px;}
 	.monitor{height:64px;width:116px;}
+	details .d-flex{gap:0;}
 	</style>
 	<script>
 	var COPPENHEIMER_VERSION = "<?php echo COPPENHEIMER_VERSION; ?>";
@@ -179,7 +180,7 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 		<p>Version <?php echo COPPENHEIMER_VERSION; ?> (<?php echo COPPENHEIMER_TIMESTAMP; ?>)</p>
 		<div class="lowered-border" style="padding:0 16px">
 			<p>An alternative UI for vAmigaWeb and some vAmiga patches – because I was jealous of <a href="https://sourceforge.net/projects/c64-debugger/" target="_blank">C64 65XE NES Debugger</a> and the likes.</p>
-			<p>This is very alpha and a hack. Read all about it on <a href="https://heckmeck.de/amigastyle/coppenheimer/" target="_blank">heckmeck.de</a>.</p>
+			<p>Read all about it on <a href="https://heckmeck.de/amigastyle/coppenheimer/" target="_blank">heckmeck.de</a>.</p>
 	 		<p><strong>Note:</strong> I did not write the emulator, or any of the cool stuff! <code>:)</code> Credits:</p>
 			<ul>
 				<li><a href="https://dirkwhoffmann.github.io/vAmiga/" target="_blank">vAmiga</a> by Dirk Hoffmann</li>
@@ -318,26 +319,26 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-21");
 				</div>
 			</div>
 			<div>
-				<details>
+				<details id="dma-usage">
 					<summary>DMA usage</summary>
 					<div class="d-flex">
-						<div class="d-col"><canvas class="monitor" id="monitor-blitter"></canvas>Blitter</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-copper"></canvas>Copper</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-disk"></canvas>Disk</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-audio"></canvas>Audio</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-sprite"></canvas>Sprite</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-bitplane"></canvas>Bitplane</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-blitter"></canvas><div>Blitter</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-copper"></canvas><div>Copper</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-disk"></canvas><div>Disk</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-audio"></canvas><div>Audio</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-sprite"></canvas><div>Sprite</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-bitplane"></canvas><div>Bitplane</div></div>
 					</div>
 				</details>
-				<details>
+				<details id="mem-usage">
 					<summary>CPU reads and writes</summary>
 					<div class="d-flex">
-						<div class="d-col"><canvas class="monitor" id="monitor-chip-r"></canvas>Chipmem reads</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-chip-w"></canvas>Chipmem writes</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-fast-r"></canvas>Fastmem reads</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-fast-w"></canvas>Fastmem writes</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-rom-r"></canvas>ROM reads</div>
-						<div class="d-col"><canvas class="monitor" id="monitor-rom-w"></canvas>ROM writes</div>
+						<div class="d-col"><canvas class="monitor" id="monitor-chip-r"></canvas><div>Chipmem reads</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-chip-w"></canvas><div>Chipmem writes</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-fast-r"></canvas><div>Fastmem reads</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-fast-w"></canvas><div>Fastmem writes</div></div>
+						<div class="d-col"><canvas class="monitor" id="monitor-rom-r"></canvas><div>ROM reads</div></div>
+						<div class="d-col"></div>
 					</div>
 				</details>
 			</div>
