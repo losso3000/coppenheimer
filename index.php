@@ -94,8 +94,8 @@ define("COPPENHEIMER_TIMESTAMP", "2024-06-26");
 	<script src="js/vAmiga_canvas-modified.js"></script>
 	<script src="js/vAmiga_canvas_gl_fast.js"></script>
 	<script src="js/vAmiga_ui-modified.js?<?php echo COPPENHEIMER_VERSION; ?>"></script>
-	<script src="js/vAmiga_storage.js"></script>
-	<script src="js/vAmiga_keyboard.js"></script>
+	<script src="js/vAmiga_storage.js?<?php echo COPPENHEIMER_VERSION; ?>">"></script>
+	<script src="js/vAmiga_keyboard.js?<?php echo COPPENHEIMER_VERSION; ?>">"></script>
 	<script src="js/jszip.min.js"></script>
 </head>
 <body>

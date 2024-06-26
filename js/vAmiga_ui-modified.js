@@ -166,6 +166,8 @@ class MonitorThing {
 			let barH = h * this.values[i];
 			this.context.fillRect(x, h - barH, 1, barH);
 		}
+		// this.context.font = "12px sans-serif";
+		// this.context.fillText("" + this.values[0], 8, 20);
 	}
 }
 
@@ -2196,6 +2198,21 @@ $('.layer').change( function(event) {
 
             //2. diese vergleichen mit der des Service workers
             sw_version=evt.data;
+            if(sw_version.cache_name != current_version) {
+            	// execute_update();
+			let current_version= await get_settings_cache_value('active_version');
+			if(current_version == null)
+			{//no version management then clear all caches
+			    let keys = await caches.keys();
+			    console.log('deleting cache files:'+keys);
+			    await Promise.all(keys.map(key => caches.delete(key)));
+			}
+			if(typeof sw_version != 'undefined')
+			{
+			    set_settings_cache_value('active_version', sw_version.cache_name);        
+			}
+			window.location.reload();
+            }
         });
 
 

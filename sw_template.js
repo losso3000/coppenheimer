@@ -97,6 +97,10 @@ self.addEventListener('fetch', function(event){
       )
       {
         console.log('sw: do not cache fetched resource: '+event.request.url);
+        // TODO better way to prevent the older versions from being cached -- Losso
+        if (event.request.url.endsWith("vAmiga.wasm")||event.request.url.endsWith("vAmiga.js")) {
+          return fetch(event.request.url + "?0.2");
+        }
         return fetch(event.request);
       }
       else
